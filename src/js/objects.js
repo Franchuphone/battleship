@@ -22,17 +22,7 @@ export class Gameboard {
 
   placeShip(coord, length, direction) {
     const [x, y] = coord;
-    if (x < 0 || x >= 10 || y < 0 || y >= 10)
-      throw new RangeError("Coordinates out of the gameboard");
-    for (let i = 0; i < length; i++) {
-      const outbound = direction === "horizontal" ? x + i >= 10 : y + i >= 10;
-      if (outbound) return false;
-      const cell =
-        direction === "horizontal"
-          ? this.board[y][x + i]
-          : this.board[y + i][x];
-      if (cell instanceof Ship || cell === "buffer") return false;
-    }
+    if (!this.isValidPlacement(coord, length, direction)) return false;
     const ship = new Ship(length);
     this.ships.push(ship);
     for (let i = 0; i < length; i++) {
@@ -74,6 +64,21 @@ export class Gameboard {
 
   isAllSunk() {
     return this.ships.every((ship) => ship.isSunk());
+  }
+
+  isValidPlacement(coord, length, direction) {
+    const [x, y] = coord;
+    if (x < 0 || y < 0) return false;
+    for (let i = 0; i < length; i++) {
+      const outbound = direction === "horizontal" ? x + i >= 10 : y + i >= 10;
+      if (outbound) return false;
+      const cell =
+        direction === "horizontal"
+          ? this.board[y][x + i]
+          : this.board[y + i][x];
+      if (cell instanceof Ship || cell === "buffer") return false;
+    }
+    return true;
   }
 }
 
@@ -152,6 +157,6 @@ export class Game {
   }
 
   placePlayerShip(coord, length, direction) {
-    this.player.gameboard.placeShip(coord, length, direction);
+    return this.player.gameboard.placeShip(coord, length, direction);
   }
 }
