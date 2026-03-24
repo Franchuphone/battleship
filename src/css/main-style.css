@@ -143,25 +143,28 @@ body {
   gap: 0.5rem;
   align-items: center;
 
-  > *:nth-child(1) {
-    margin-top: 0.2rem;
-  }
-
-  > * {
+  .ship {
     display: flex;
     grid-auto-flow: column;
     gap: 0.1rem;
     background-color: transparent;
+    transition: transform 0.5s;
 
     > * {
       height: 2rem;
       aspect-ratio: 1 / 1;
       background-color: var(--color-qua);
       border-radius: var(--radius-pri);
+      outline: 0.2em ridge var(--color-pri);
     }
   }
 
-  > *:hover {
+  .ship.vertical {
+    transform: rotate(90deg);
+    /* flex-direction: column; */
+  }
+
+  .ship:hover {
     cursor: move;
   }
 
@@ -169,6 +172,7 @@ body {
     > * {
       background-color: transparent;
       border: 0.1em solid var(--color-qua);
+      outline: none;
     }
   }
 
@@ -193,7 +197,7 @@ body {
     border: none;
   }
 
-  button:hover {
+  button:not(.inactive):hover {
     background-color: var(--color-pri);
     color: var(--color-qua);
     outline: 0.1em solid var(--color-qua);
@@ -203,6 +207,11 @@ body {
   #start {
     grid-column: 1 / 3;
     width: 60%;
+  }
+
+  #start.inactive {
+    cursor: none;
+    filter: grayscale(0.5) blur(1px);
   }
 
   #random {
@@ -280,6 +289,7 @@ body {
 
   .cell.drop .front {
     outline: 0.3em solid var(--color-valid);
+    background-color: var(--color-sec);
   }
 }
 
