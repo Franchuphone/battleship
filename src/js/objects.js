@@ -80,6 +80,12 @@ export class Gameboard {
     }
     return true;
   }
+
+  reset() {
+    this.board = Array.from({ length: 10 }, () => new Array(10).fill(null));
+    this.ships = [];
+    this.attackedCoords = new Set();
+  }
 }
 
 export class Player {
@@ -87,8 +93,16 @@ export class Player {
     this.gameboard = new Gameboard();
   }
 
-  placeShips() {
-    throw new Error("Not implemented"); // UI handles human placement
+  randomPlaceShips() {
+    for (const shipLength of [2, 3, 3, 4, 5]) {
+      let coord,
+        random,
+        direction = ["horizontal", "vertical"];
+      do {
+        coord = Array.from({ length: 2 }, () => Math.floor(Math.random() * 10));
+        random = Math.floor(Math.random() * 2);
+      } while (!this.gameboard.placeShip(coord, shipLength, direction[random]));
+    }
   }
 
   attack(coord, enemyBoard) {
@@ -109,18 +123,6 @@ export class ComputerPlayer extends Player {
     } while (enemyBoard.attackedCoords.has(coord.join(",")));
     this.lastAttack = coord;
     return enemyBoard.receiveAttack(coord);
-  }
-
-  placeShips() {
-    for (const shipLength of [2, 3, 3, 4, 5]) {
-      let coord,
-        random,
-        direction = ["horizontal", "vertical"];
-      do {
-        coord = Array.from({ length: 2 }, () => Math.floor(Math.random() * 10));
-        random = Math.floor(Math.random() * 2);
-      } while (!this.gameboard.placeShip(coord, shipLength, direction[random]));
-    }
   }
 }
 
@@ -152,7 +154,7 @@ export class Game {
   }
 
   start() {
-    this.computer.placeShips();
+    this.computer.randomPlaceShips();
     this.playerTurn = true;
   }
 

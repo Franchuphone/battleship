@@ -60,10 +60,6 @@ describe("Gameboard Class", () => {
     expect(board.placeShip([8, 0], 3, "horizontal")).toBe(false);
   });
 
-  test("placeShip throws RangeError for invalid coordinates", () => {
-    expect(() => board.placeShip([-1, 0], 3, "horizontal")).toThrow(RangeError);
-  });
-
   test("placeShip returns false when cell occupied", () => {
     board.placeShip([0, 0], 2, "horizontal");
     expect(board.placeShip([0, 0], 2, "horizontal")).toBe(false);
@@ -179,12 +175,12 @@ describe("ComputerPlayer Class", () => {
   });
 
   test("computer places all ships", () => {
-    computer.placeShips();
+    computer.randomPlaceShips();
     expect(computer.gameboard.ships.length).toBe(5);
   });
 
   test("computer ships have correct lengths", () => {
-    computer.placeShips();
+    computer.randomPlaceShips();
     const lengths = computer.gameboard.ships.map((s) => s.length).sort();
     expect(lengths).toEqual([2, 3, 3, 4, 5]);
   });

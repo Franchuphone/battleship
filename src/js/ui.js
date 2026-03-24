@@ -1,5 +1,5 @@
 import { setupPlayer } from "../html/setupPlayer";
-import { Game } from "./objects";
+import { Game, Ship } from "./objects";
 
 let dragData = {};
 
@@ -8,19 +8,47 @@ export function displayHeader(string = "Welcome to Battleship War !") {
   header.textContent = string;
 }
 
-export function displaySetup() {
-  const { leftPanel, rightPanel } = listenElements();
+export function displaySetup(game) {
+  const { leftPanel, rightPanel } = listenElements(),
+    { grid, gridName } = displayGrid(game.playerName, "setup", game);
+  rightPanel.innerHTML = "";
+  rightPanel.append(gridName, grid);
   leftPanel.innerHTML = setupPlayer;
+  generateFleet();
+  const { clearBtn, startBtn, randomBtn, fleet } = listenElements();
+  clearBtn.addEventListener("click", () => {
+    game.player.gameboard.reset();
+    fleet.innerHTML = "";
+    const { grid, gridName } = displayGrid(game.playerName, "setup", game);
+    generateFleet();
+    rightPanel.innerHTML = "";
+    rightPanel.append(gridName, grid);
+    startBtn.classList.add("inactive");
+  });
+  randomBtn.addEventListener("click", () => {
+    game.player.gameboard.reset();
+    game.player.randomPlaceShips();
+    const { grid, gridName } = displayGrid(game.playerName, "setup", game);
+    rightPanel.innerHTML = "";
+    rightPanel.append(gridName, grid);
+    for (let y = 0; y < 10; y++) {
+      for (let x = 0; x < 10; x++) {
+        if (game.player.gameboard.board[y][x] instanceof Ship) {
+          const cell = grid.querySelector(`[x="${x}"][y="${y}"]`);
+          cell.classList.add("drop");
+        }
+      }
+    }
+    startBtn.classList.remove("inactive");
+    Array.from(fleet.children).forEach((ship) => ship.classList.add("placed"));
+  });
 }
 
-export function displayGrid(playerName, type, game) {
-  const { rightPanel } = listenElements(),
-    gridName = document.createElement("div"),
+function displayGrid(playerName, type, game) {
+  const gridName = document.createElement("div"),
     grid = generateGrid(playerName),
     cells = grid.querySelectorAll(".cell");
   gridName.textContent = playerName;
-  rightPanel.innerHTML = "";
-  rightPanel.append(gridName, grid);
 
   if (type === "setup") {
     cells.forEach((cell) => {
@@ -53,17 +81,26 @@ export function displayGrid(playerName, type, game) {
           y = parseInt(cell.getAttribute("y")),
           length = parseInt(dragData.length),
           direction = dragData.direction,
-          valid = game.player.gameboard.isValidPlacement(
-            [x, y],
-            length,
-            direction,
-          );
+          valid = game.placePlayerShip([x, y], length, direction);
         highlightCells(grid, x, y, length, direction, valid, "drop");
-        game.placePlayerShip([x, y], length, direction);
-        const ghost = dragData.element;
-        ghost.classList.add("placed");
-        ghost.setAttribute("draggable", false);
-        // dragData.element.replaceWith(ghost);
+        if (valid) {
+          dragData.element.classList.add("placed");
+          dragData.element.classList.remove("vertical");
+          dragData.element.setAttribute("draggable", false);
+          dragData.element.removeEventListener(
+            "contextmenu",
+            dragData.handleRotation,
+          );
+          if (game.player.gameboard.ships.length === 5) {
+            const { startBtn } = listenElements();
+            startBtn.classList.remove("inactive");
+            (startBtn.addEventListener("click", () => {
+              game.start();
+              displayBattle();
+            }),
+              { once: true });
+          }
+        }
       });
     });
   }
@@ -80,23 +117,8 @@ export function displayGrid(playerName, type, game) {
       });
     });
   }
-}
 
-export function listenElements() {
-  const container = document.querySelector(".container");
-  const header = document.querySelector(".header");
-  const leftPanel = document.querySelector(".left-panel");
-  const rightPanel = document.querySelector(".right-panel");
-  const infoBar = document.querySelector(".info-bar");
-  const fleet = document.querySelector(".fleet");
-  return {
-    container,
-    header,
-    leftPanel,
-    rightPanel,
-    infoBar,
-    fleet,
-  };
+  return { grid, gridName };
 }
 
 function generateGrid() {
@@ -119,7 +141,7 @@ function generateGrid() {
   return grid;
 }
 
-export function generateFleet() {
+function generateFleet() {
   const fleetLength = [2, 3, 3, 4, 5];
   const { fleet } = listenElements();
   for (let length of fleetLength) {
@@ -133,11 +155,23 @@ function generateShip(length) {
   ship.setAttribute("length", length);
   ship.setAttribute("direction", "horizontal");
   ship.setAttribute("draggable", true);
+
+  function handleRotation(e) {
+    e.preventDefault();
+    ship.getAttribute("direction") === "horizontal"
+      ? ship.setAttribute("direction", "vertical")
+      : ship.setAttribute("direction", "horizontal");
+    ship.classList.toggle("vertical");
+  }
+
+  ship.addEventListener("contextmenu", handleRotation);
   ship.addEventListener("dragstart", (e) => {
     dragData.length = ship.getAttribute("length");
     dragData.direction = ship.getAttribute("direction");
     dragData.element = ship;
+    dragData.handleRotation = handleRotation;
   });
+
   for (let i = 0; i < length; i++) {
     const shipCell = document.createElement("div");
     ship.append(shipCell);
@@ -161,10 +195,31 @@ function highlightCells(
     if (targetCell) {
       targetCell.classList.remove("valid", "invalid");
       if (state === "drop" && valid) targetCell.classList.add("drop");
-      else if (valid !== null)
-        targetCell.classList.add(valid ? "valid" : "invalid");
       if (valid !== null && state === null)
         targetCell.classList.add(valid ? "valid" : "invalid");
     }
   }
+}
+
+function listenElements() {
+  const container = document.querySelector(".container");
+  const header = document.querySelector(".header");
+  const leftPanel = document.querySelector(".left-panel");
+  const rightPanel = document.querySelector(".right-panel");
+  const infoBar = document.querySelector(".info-bar");
+  const fleet = document.querySelector(".fleet");
+  const clearBtn = document.querySelector("#clear");
+  const startBtn = document.querySelector("#start");
+  const randomBtn = document.querySelector("#random");
+  return {
+    container,
+    header,
+    leftPanel,
+    rightPanel,
+    infoBar,
+    fleet,
+    clearBtn,
+    startBtn,
+    randomBtn,
+  };
 }

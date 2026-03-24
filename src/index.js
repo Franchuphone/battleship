@@ -13,6 +13,4 @@ import { Game } from "./js/objects";
 const game = new Game("Your fleet");
 
 displayHeader();
-displaySetup();
-generateFleet();
-displayGrid(game.playerName, "setup", game);
+displaySetup(game);
