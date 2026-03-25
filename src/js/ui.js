@@ -302,6 +302,7 @@ function displayCellHits(cell, hit, x, y, grid) {
   if (hit === true) cell.classList.add("hit");
   if (hit === false) cell.classList.add("miss");
   if (hit === "sunk") {
+    cell.classList.remove("drop");
     cell.classList.add("sunk");
     displaySunkShip(x, y, grid);
   }
@@ -316,6 +317,7 @@ function displaySunkShip(x, y, grid) {
     if (cx >= 0 && cx < 10) {
       cell = grid.querySelector(`[x="${cx}"][y="${y}"]`);
       if (cell.classList.contains("hit")) {
+        cell.classList.remove("drop");
         cell.classList.remove("hit");
         cell.classList.add("sunk");
         displaySunkShip(cx, y, grid);
@@ -324,6 +326,7 @@ function displaySunkShip(x, y, grid) {
     if (cy >= 0 && cy < 10) {
       cell = grid.querySelector(`[x="${x}"][y="${cy}"]`);
       if (cell.classList.contains("hit")) {
+        cell.classList.remove("drop");
         cell.classList.remove("hit");
         cell.classList.add("sunk");
         displaySunkShip(x, cy, grid);
