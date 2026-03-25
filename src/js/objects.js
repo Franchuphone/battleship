@@ -161,4 +161,8 @@ export class Game {
   placePlayerShip(coord, length, direction) {
     return this.player.gameboard.placeShip(coord, length, direction);
   }
+
+  renamePlayer(name) {
+    this.playerName = name ? name + "'s fleet" : "Your fleet";
+  }
 }
