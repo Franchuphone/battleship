@@ -7,15 +7,15 @@ export function handleStartBtn() {
   displayBattle();
 }
 
-export function handlePlayerAttack(coord) {
-  const { hit, winner, attackedCoord } = game.playTurn(coord);
-  if (winner) displayEndGame(winner); // new funtion to display end game menu and restart button, blocking all other actions
-  setTimeout(handleComputerAttack, 1000);
+export function handlePlayerAttack(coord, onComputerAttack) {
+  const { hit, winner } = game.playTurn(coord);
+  if (winner) displayEndGame(winner);
+  else setTimeout(() => handleComputerAttack(onComputerAttack), 1000);
   return hit;
 }
 
-export function handleComputerAttack() {
+export function handleComputerAttack(callback) {
   const { hit, winner, attackedCoord } = game.playTurn();
   if (winner) displayEndGame(winner);
-  return { hit, attackedCoord };
+  callback(hit, attackedCoord);
 }

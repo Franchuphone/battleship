@@ -1,24 +1,27 @@
 import { setupPlayer } from "../html/setupPlayer";
 import { Game, Ship } from "./objects";
-import {
-  handleStartBtn,
-  handlePlayerAttack,
-  handleComputerAttack,
-} from "./logic";
+import { handleStartBtn, handlePlayerAttack } from "./logic";
+import { dialogBox } from "../html/dialogBox";
 
-let dragData = {};
-export const game = new Game("Your fleet");
+let dragData = {},
+  playerBoard = null,
+  enemyBoard = null;
+
+export let game = new Game("Your fleet");
 
 export function displayHeader(string = "Welcome to Battleship War !") {
   const { header } = listenElements();
   header.textContent = string;
 }
 
+export function displayInfoBar(string = "Waiting for your fleet") {}
+
 export function displaySetup() {
   const { leftPanel, rightPanel } = listenElements(),
     { grid, gridName } = displayGrid(game.playerName, "setup");
   rightPanel.innerHTML = "";
   rightPanel.append(gridName, grid);
+  leftPanel.innerHTML = "";
   leftPanel.innerHTML = setupPlayer;
   const { clearBtn, startBtn, randomBtn, fleet, playerName } = listenElements();
   fleet.innerHTML = "";
@@ -63,6 +66,8 @@ export function displayBattle() {
     "Enemy",
     "battle-enemy",
   );
+  playerBoard = playerGrid;
+  enemyBoard = enemyGrid;
   playerGrid.classList.add("battle");
   leftPanel.append(playerName, playerGrid);
   rightPanel.append(enemyName, enemyGrid);
@@ -74,6 +79,7 @@ function displayGrid(name, type) {
     grid = generateGrid(name),
     cells = grid.querySelectorAll(".cell");
   gridName.textContent = name;
+  gridName.classList.add("player-name");
 
   if (type === "setup") {
     cells.forEach((cell) => {
@@ -129,12 +135,16 @@ function displayGrid(name, type) {
     cells.forEach((cell) => {
       cell.addEventListener("click", () => {
         cells.forEach((c) => (c.style.pointerEvents = "none"));
+        console.log(playerBoard);
         const x = parseInt(cell.getAttribute("x")),
           y = parseInt(cell.getAttribute("y")),
-          hit = handlePlayerAttack([x, y]);
-        if (hit === true) cell.classList.add("hit");
-        if (hit === false) cell.classList.add("miss");
-        if (hit === "sunk") cell.classList.add("sunk");
+          hit = handlePlayerAttack([x, y], (computerHit, coord) => {
+            const [cx, cy] = coord,
+              targetCell = playerBoard.querySelector(`[x="${cx}"][y="${cy}"]`);
+            displayCellHits(targetCell, computerHit);
+            cells.forEach((c) => (c.style.pointerEvents = "auto"));
+          });
+        displayCellHits(cell, hit);
       });
     });
   }
@@ -144,6 +154,54 @@ function displayGrid(name, type) {
   }
 
   return { grid, gridName };
+}
+
+export function displayEndGame(winner) {
+  const dialog = document.createElement("dialog");
+  let dialogContent = dialogBox,
+    looser = winner === "player" ? "computer" : game.playerName;
+  winner = winner === "player" ? game.playerName : "computer";
+  winner = winner.charAt(0).toUpperCase() + winner.slice(1);
+  looser = looser.charAt(0).toUpperCase() + looser.slice(1);
+  dialogContent = dialogContent
+    .replace("{{winner}}", winner)
+    .replace("{{looser}}", looser);
+  dialog.innerHTML = dialogContent;
+  document.body.append(dialog);
+  dialog.showModal();
+  const { newGameBtn } = listenElements();
+  newGameBtn.addEventListener("click", () => {
+    game = new Game();
+    displaySetup();
+    dialog.close();
+  });
+}
+
+export function listenElements() {
+  const container = document.querySelector(".container");
+  const header = document.querySelector(".header");
+  const leftPanel = document.querySelector(".left-panel");
+  const rightPanel = document.querySelector(".right-panel");
+  const infoBar = document.querySelector(".info-bar");
+  const fleet = document.querySelector(".fleet");
+  const clearBtn = document.querySelector("#clear");
+  const startBtn = document.querySelector("#start");
+  const randomBtn = document.querySelector("#random");
+  const playerName = document.querySelector("#player");
+  const newGameBtn = document.querySelector("#restart");
+  return {
+    container,
+    header,
+    leftPanel,
+    rightPanel,
+    infoBar,
+    fleet,
+    clearBtn,
+    startBtn,
+    randomBtn,
+    playerName,
+    newGameBtn,
+  };
 }
 
 function generateGrid() {
@@ -172,33 +230,6 @@ function generateFleet() {
   for (let length of fleetLength) {
     fleet.append(generateShip(length));
   }
-}
-
-export function displayEndGame() {}
-
-export function listenElements() {
-  const container = document.querySelector(".container");
-  const header = document.querySelector(".header");
-  const leftPanel = document.querySelector(".left-panel");
-  const rightPanel = document.querySelector(".right-panel");
-  const infoBar = document.querySelector(".info-bar");
-  const fleet = document.querySelector(".fleet");
-  const clearBtn = document.querySelector("#clear");
-  const startBtn = document.querySelector("#start");
-  const randomBtn = document.querySelector("#random");
-  const playerName = document.querySelector("#player");
-  return {
-    container,
-    header,
-    leftPanel,
-    rightPanel,
-    infoBar,
-    fleet,
-    clearBtn,
-    startBtn,
-    randomBtn,
-    playerName,
-  };
 }
 
 function generateShip(length) {
@@ -262,4 +293,10 @@ function displayRandomGeneratedShips(grid) {
       }
     }
   }
+}
+
+function displayCellHits(cell, hit) {
+  if (hit === true) cell.classList.add("hit");
+  if (hit === false) cell.classList.add("miss");
+  if (hit === "sunk") cell.classList.add("sunk");
 }
