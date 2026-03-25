@@ -14,7 +14,10 @@ export function displayHeader(string = "Welcome to Battleship War !") {
   header.textContent = string;
 }
 
-export function displayInfoBar(string = "Waiting for your fleet") {}
+export function displayInfoBar(string = "Waiting for your fleet") {
+  const { infoBar } = listenElements();
+  infoBar.textContent = string;
+}
 
 export function displaySetup() {
   const { leftPanel, rightPanel } = listenElements(),
@@ -63,15 +66,64 @@ export function displayBattle() {
     "battle-player",
   );
   const { grid: enemyGrid, gridName: enemyName } = displayGrid(
-    "Enemy",
+    "Enemy's fleet",
     "battle-enemy",
   );
+  displayInfoBar("Your turn to attack");
   playerBoard = playerGrid;
   enemyBoard = enemyGrid;
   playerGrid.classList.add("battle");
   leftPanel.append(playerName, playerGrid);
   rightPanel.append(enemyName, enemyGrid);
   console.log(game.computer.gameboard.board);
+}
+
+export function displayEndGame(winner) {
+  const dialog = document.createElement("dialog");
+  let dialogContent = dialogBox,
+    looser = winner === "player" ? "computer" : game.playerName;
+  winner = winner === "player" ? game.playerName : "computer";
+  winner = winner.charAt(0).toUpperCase() + winner.slice(1);
+  looser = looser.charAt(0).toUpperCase() + looser.slice(1);
+  dialogContent = dialogContent
+    .replace("{{winner}}", winner)
+    .replace("{{looser}}", looser);
+  dialog.innerHTML = dialogContent;
+  document.body.append(dialog);
+  dialog.showModal();
+  const { newGameBtn } = listenElements();
+  newGameBtn.addEventListener("click", () => {
+    game = new Game();
+    displaySetup();
+    dialog.close();
+  });
+}
+
+export function listenElements() {
+  const container = document.querySelector(".container");
+  const header = document.querySelector(".header");
+  const leftPanel = document.querySelector(".left-panel");
+  const rightPanel = document.querySelector(".right-panel");
+  const infoBar = document.querySelector(".info-text");
+  const fleet = document.querySelector(".fleet");
+  const clearBtn = document.querySelector("#clear");
+  const startBtn = document.querySelector("#start");
+  const randomBtn = document.querySelector("#random");
+  const playerName = document.querySelector("#player");
+  const newGameBtn = document.querySelector("#restart");
+  return {
+    container,
+    header,
+    leftPanel,
+    rightPanel,
+    infoBar,
+    fleet,
+    clearBtn,
+    startBtn,
+    randomBtn,
+    playerName,
+    newGameBtn,
+  };
 }
 
 function displayGrid(name, type) {
@@ -135,16 +187,15 @@ function displayGrid(name, type) {
     cells.forEach((cell) => {
       cell.addEventListener("click", () => {
         cells.forEach((c) => (c.style.pointerEvents = "none"));
-        console.log(playerBoard);
         const x = parseInt(cell.getAttribute("x")),
           y = parseInt(cell.getAttribute("y")),
           hit = handlePlayerAttack([x, y], (computerHit, coord) => {
             const [cx, cy] = coord,
               targetCell = playerBoard.querySelector(`[x="${cx}"][y="${cy}"]`);
-            displayCellHits(targetCell, computerHit);
+            displayCellHits(targetCell, computerHit, cx, cy, playerBoard);
             cells.forEach((c) => (c.style.pointerEvents = "auto"));
           });
-        displayCellHits(cell, hit);
+        displayCellHits(cell, hit, x, y, enemyBoard);
       });
     });
   }
@@ -154,54 +205,6 @@ function displayGrid(name, type) {
   }
 
   return { grid, gridName };
-}
-
-export function displayEndGame(winner) {
-  const dialog = document.createElement("dialog");
-  let dialogContent = dialogBox,
-    looser = winner === "player" ? "computer" : game.playerName;
-  winner = winner === "player" ? game.playerName : "computer";
-  winner = winner.charAt(0).toUpperCase() + winner.slice(1);
-  looser = looser.charAt(0).toUpperCase() + looser.slice(1);
-  dialogContent = dialogContent
-    .replace("{{winner}}", winner)
-    .replace("{{looser}}", looser);
-  dialog.innerHTML = dialogContent;
-  document.body.append(dialog);
-  dialog.showModal();
-  const { newGameBtn } = listenElements();
-  newGameBtn.addEventListener("click", () => {
-    game = new Game();
-    displaySetup();
-    dialog.close();
-  });
-}
-
-export function listenElements() {
-  const container = document.querySelector(".container");
-  const header = document.querySelector(".header");
-  const leftPanel = document.querySelector(".left-panel");
-  const rightPanel = document.querySelector(".right-panel");
-  const infoBar = document.querySelector(".info-bar");
-  const fleet = document.querySelector(".fleet");
-  const clearBtn = document.querySelector("#clear");
-  const startBtn = document.querySelector("#start");
-  const randomBtn = document.querySelector("#random");
-  const playerName = document.querySelector("#player");
-  const newGameBtn = document.querySelector("#restart");
-  return {
-    container,
-    header,
-    leftPanel,
-    rightPanel,
-    infoBar,
-    fleet,
-    clearBtn,
-    startBtn,
-    randomBtn,
-    playerName,
-    newGameBtn,
-  };
 }
 
 function generateGrid() {
@@ -295,8 +298,36 @@ function displayRandomGeneratedShips(grid) {
   }
 }
 
-function displayCellHits(cell, hit) {
+function displayCellHits(cell, hit, x, y, grid) {
   if (hit === true) cell.classList.add("hit");
   if (hit === false) cell.classList.add("miss");
-  if (hit === "sunk") cell.classList.add("sunk");
+  if (hit === "sunk") {
+    cell.classList.add("sunk");
+    displaySunkShip(x, y, grid);
+  }
+}
+
+function displaySunkShip(x, y, grid) {
+  let cell = null;
+  const possibleMoves = [-1, 1];
+  for (const move of possibleMoves) {
+    const cx = x + move,
+      cy = y + move;
+    if (cx >= 0 && cx < 10) {
+      cell = grid.querySelector(`[x="${cx}"][y="${y}"]`);
+      if (cell.classList.contains("hit")) {
+        cell.classList.remove("hit");
+        cell.classList.add("sunk");
+        displaySunkShip(cx, y, grid);
+      }
+    }
+    if (cy >= 0 && cy < 10) {
+      cell = grid.querySelector(`[x="${x}"][y="${cy}"]`);
+      if (cell.classList.contains("hit")) {
+        cell.classList.remove("hit");
+        cell.classList.add("sunk");
+        displaySunkShip(x, cy, grid);
+      }
+    }
+  }
 }
