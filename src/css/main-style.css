@@ -237,27 +237,22 @@ button:not(.inactive):hover {
   height: 100%;
 }
 
-.grid-name {
-}
-
 .grid {
+  aspect-ratio: 1 /1;
   margin: auto;
   display: grid;
-  grid-template-rows: repeat(10, minmax(2rem, 1fr));
-  grid-template-columns: repeat(10, minmax(2rem, 1fr));
+  grid-template-rows: repeat(10, 1fr);
+  grid-template-columns: repeat(10, 1fr);
   gap: 0.2rem;
   perspective: 400px;
 
   .cell {
+    width: clamp(1rem, 1rem + 2vw, 5rem);
+    aspect-ratio: 1 /1;
     position: relative;
     border-radius: 0.3em;
     transition: transform 0.6s ease-in-out;
     transform-style: preserve-3d;
-  }
-
-  :not(.battle) .cell .front:hover {
-    background-color: color-mix(in srgb, var(--color-qua), black 10%);
-    cursor: pointer;
   }
 
   .cell .front,
@@ -313,9 +308,18 @@ button:not(.inactive):hover {
   }
 }
 
+.grid:not(.battle) .cell .front:hover {
+  background-color: color-mix(in srgb, var(--color-qua), black 10%);
+  cursor: pointer;
+}
+
 .battle {
   opacity: 0.5;
   cursor: none;
+
+  .cell.drop {
+    outline: 0.3em solid var(--color-valid);
+  }
 }
 
 dialog {
@@ -348,22 +352,54 @@ dialog::backdrop {
 }
 
 .info-bar {
+  position: relative;
   grid-column: span 2;
+  overflow: hidden;
+  text-align: center;
+  padding: calc(1.5 * var(--size-pri));
 }
 
-@keyframes expand {
-  from {
-    background-image: radial-gradient(
-      ellipse 0% 100% at center,
-      var(--color-hit),
-      transparent
-    );
+.sonar-emitter,
+.sonar-wave {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  width: 0;
+  height: 0;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.sonar-wave1 {
+  animation: sonar 4s linear infinite;
+}
+
+.sonar-wave2 {
+  animation: sonar 4s linear 2.5s infinite;
+}
+
+.info-text {
+  /* position: relative; */
+  z-index: 1;
+  font-size: calc(1.5 * var(--size-pri));
+  font-weight: 500;
+}
+
+@keyframes sonar {
+  0% {
+    width: 0;
+    height: 0;
+    opacity: 0.6;
   }
-  to {
-    background-image: radial-gradient(
-      ellipse 200% 100% at center,
-      var(--color-hit),
-      transparent
-    );
+  50% {
+    width: 80vw;
+    height: 500px;
+    opacity: 0.1;
+  }
+  100% {
+    width: 80vw;
+    height: 500px;
+    opacity: 0;
   }
 }
