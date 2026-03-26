@@ -66,6 +66,23 @@ button:not(.inactive):hover {
   cursor: pointer;
 }
 
+#restart {
+  position: absolute;
+  --spacing: min(1vh, 1vw);
+  width: max(4vh, 4vw);
+  aspect-ratio: 1 / 1;
+  border-radius: 100%;
+  position: absolute;
+  top: var(--spacing);
+  left: var(--spacing);
+  font-weight: 500;
+  font-size: 0.8rem;
+
+  :hover {
+    cursor: pointer;
+  }
+}
+
 #github {
   --spacing: min(1vh, 1vw);
   width: max(3vh, 3vw);
@@ -80,6 +97,7 @@ button:not(.inactive):hover {
 }
 
 .container {
+  position: relative;
   margin: auto;
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -371,7 +389,6 @@ dialog::backdrop {
 }
 
 .info-text {
-  /* position: relative; */
   z-index: 1;
   font-size: calc(1.5 * var(--size-pri));
   font-weight: 500;

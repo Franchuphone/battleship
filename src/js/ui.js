@@ -58,7 +58,16 @@ export function displaySetup() {
 }
 
 export function displayBattle() {
-  const { leftPanel, rightPanel } = listenElements();
+  const { leftPanel, rightPanel } = listenElements(),
+    restartBtn = document.createElement("button");
+  document.body.append(restartBtn);
+  restartBtn.id = "restart";
+  restartBtn.textContent = "NEW";
+  restartBtn.addEventListener("click", () => {
+    game = new Game();
+    displaySetup();
+    restartBtn.remove();
+  });
   leftPanel.innerHTML = "";
   rightPanel.innerHTML = "";
   const { grid: playerGrid, gridName: playerName } = displayGrid(
@@ -75,7 +84,6 @@ export function displayBattle() {
   playerGrid.classList.add("battle");
   leftPanel.append(playerName, playerGrid);
   rightPanel.append(enemyName, enemyGrid);
-  console.log(game.computer.gameboard.board);
 }
 
 export function displayEndGame(winner) {
@@ -91,11 +99,12 @@ export function displayEndGame(winner) {
   dialog.innerHTML = dialogContent;
   document.body.append(dialog);
   dialog.showModal();
-  const { newGameBtn } = listenElements();
+  const { newGameBtn, restartBtn } = listenElements();
   newGameBtn.addEventListener("click", () => {
     game = new Game();
     displaySetup();
     dialog.close();
+    restartBtn.remove();
   });
 }
 
@@ -110,7 +119,8 @@ export function listenElements() {
   const startBtn = document.querySelector("#start");
   const randomBtn = document.querySelector("#random");
   const playerName = document.querySelector("#player");
-  const newGameBtn = document.querySelector("#restart");
+  const newGameBtn = document.querySelector("#new-game");
+  const restartBtn = document.querySelector("#restart");
   return {
     container,
     header,
@@ -123,6 +133,7 @@ export function listenElements() {
     randomBtn,
     playerName,
     newGameBtn,
+    restartBtn,
   };
 }
 
