@@ -113,16 +113,61 @@ export class Player {
 export class ComputerPlayer extends Player {
   constructor() {
     super();
-    this.lastAttack;
+    this.lastAttack = null;
+    this.lastHit = false;
+    this.mode = "hunt";
+    this.targets = [];
+    this.hitDirection = null;
+    this.firstHit = null;
   }
 
   attack(enemyBoard) {
     let coord;
-    do {
-      coord = Array.from({ length: 2 }, () => Math.floor(Math.random() * 10));
-    } while (enemyBoard.attackedCoords.has(coord.join(",")));
+    console.log(this.targets);
+    if (this.mode === "target" && this.targets.length > 0) {
+      coord = this.targets.pop();
+    }
+    if (this.mode === "hunt") {
+      do {
+        coord = Array.from({ length: 2 }, () => Math.floor(Math.random() * 10));
+      } while (enemyBoard.attackedCoords.has(coord.join(",")));
+    }
     this.lastAttack = coord;
-    return enemyBoard.receiveAttack(coord);
+    this.lastHit = enemyBoard.receiveAttack(coord);
+    if (this.lastHit === true) {
+      if (!this.firstHit) this.firstHit = coord;
+      else if (!this.hitDirection)
+        this.hitDirection =
+          this.firstHit[0] === coord[0] ? "vertical" : "horizontal";
+      this.mode = "target";
+      this.targets.push(...this.#getAdjacentCells(coord, enemyBoard));
+    }
+    if (this.lastHit === "sunk") {
+      this.mode = "hunt";
+      this.targets = [];
+      this.firstHit = null;
+      this.hitDirection = null;
+    }
+    return this.lastHit;
+  }
+
+  #getAdjacentCells(coord, enemyBoard) {
+    const [x, y] = coord;
+    return [
+      [x + 1, y],
+      [x - 1, y],
+      [x, y + 1],
+      [x, y - 1],
+    ].filter(
+      ([cx, cy]) =>
+        cx >= 0 &&
+        cx < 10 &&
+        cy >= 0 &&
+        cy < 10 &&
+        !enemyBoard.attackedCoords.has(`${cx},${cy}`) &&
+        !(this.hitDirection === "vertical" && cx !== x) &&
+        !(this.hitDirection === "horizontal" && cy !== y),
+    );
   }
 }
 
