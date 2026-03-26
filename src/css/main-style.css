@@ -87,7 +87,6 @@ button:not(.inactive):hover {
   place-items: center;
   place-content: center;
   width: 80%;
-  height: 80%;
   gap: calc(2 * var(--size-pri));
 }
 
@@ -106,21 +105,18 @@ button:not(.inactive):hover {
 }
 
 .header {
-  grid-area: 1 / 1 / 2 / 3;
+  grid-column: span 2;
   font-size: calc(2 * var(--size-pri));
   font-weight: 900;
+  text-wrap: balance;
+  text-align: center;
+  line-height: 1em;
 }
 
 .left-panel {
   flex-direction: column;
   gap: 2rem;
   text-align: center;
-  /* height: 100%; */
-
-  /* > * {
-    width: 60%;
-    align-content: center;
-  }*/
 }
 
 .player-name {
@@ -128,6 +124,7 @@ button:not(.inactive):hover {
   font-size: calc(1.5 * var(--size-pri));
   font-weight: 700;
   width: 100%;
+  line-height: 1em;
 }
 
 .input {
@@ -144,6 +141,7 @@ button:not(.inactive):hover {
     font-weight: 900;
     padding: 0.1em 0.5em;
     text-align: center;
+    max-width: 80%;
   }
 
   input:focus {
@@ -230,11 +228,9 @@ button:not(.inactive):hover {
 }
 
 .right-panel {
-  display: flex;
   flex-direction: column;
   text-align: center;
   gap: calc(2 * var(--size-pri));
-  height: 100%;
 }
 
 .grid {
@@ -316,6 +312,7 @@ button:not(.inactive):hover {
 .battle {
   opacity: 0.5;
   cursor: none;
+  animation: slide-in 1s;
 
   .cell.drop {
     outline: 0.3em solid var(--color-valid);
@@ -380,6 +377,24 @@ dialog::backdrop {
   font-weight: 500;
 }
 
+@keyframes push-in {
+  from {
+    transform: translateY(150%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-in {
+  from {
+    transform: translateX(40vw);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
 @keyframes sonar {
   0% {
     width: 0;
@@ -401,6 +416,23 @@ dialog::backdrop {
 @media (max-width: 800px) {
   .container {
     grid-template-columns: 1fr;
-    grid-template-rows: 1fr 10fr 10fr 1fr;
+    grid-template-rows: repeat(4, auto);
+    grid-auto-flow: column;
+
+    > * {
+      grid-column: span 2;
+    }
+
+    > *:first-child {
+      margin-top: calc(2 * var(--size-pri));
+    }
+
+    > *:last-child {
+      margin-bottom: calc(2 * var(--size-pri));
+    }
+  }
+
+  .battle {
+    animation: push-in 1s;
   }
 }
