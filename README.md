@@ -2,7 +2,7 @@
 
 # <img src="https://www.theodinproject.com/assets/icons/odin-icon-22b41941.svg"> <br>
 
-# ☀️ Weather App
+# ⚓ Battleship
 
 **A classic browser-based Battleship game, meticulously crafted with Vanilla JavaScript for The Odin Project.**
 
@@ -78,11 +78,13 @@ Before you begin, ensure you have the following installed:
 ```
 battleship/
 ├── src/                    # All source code for the game logic and UI
-│   ├── modules/            # Individual game modules (e.g., gameboard, player, ship)
-│   ├── dom-elements.js     # Manages DOM manipulation and UI rendering
-│   ├── game.js             # Main game orchestration
+│   ├── css/                # All style sheets
+│   ├── fonts/              # Fonts folder
+│   ├── html/               # Html templates
+│   ├── img/                # Images folder
+│   ├── js/                 # Game logic and ui manipulations
 │   ├── index.js            # Entry point of the application
-│   └── style.css           # Global styles for the game
+│   └── template.hmlt       # Main html file
 ├── dist/                   # Output directory for production builds
 ├── babel.config.js         # Babel configuration for JavaScript transpilation
 ├── eslint.config.mjs       # ESLint configuration for code quality
@@ -171,4 +173,3 @@ No particular license, just keep in mind to respect the work of others and just 
 Made with ❤️ by Franchuphone
 
 </div>
-define
