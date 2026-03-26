@@ -308,7 +308,7 @@ button:not(.inactive):hover {
   }
 }
 
-.grid:not(.battle) .cell .front:hover {
+.grid:not(.battle) .cell:not(.drop) .front:hover {
   background-color: color-mix(in srgb, var(--color-qua), black 10%);
   cursor: pointer;
 }
