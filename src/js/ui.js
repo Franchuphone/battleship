@@ -205,7 +205,15 @@ function displayGrid(name, type) {
             const [cx, cy] = coord,
               targetCell = playerBoard.querySelector(`[x="${cx}"][y="${cy}"]`);
             displayCellHits(targetCell, computerHit, cx, cy, playerBoard);
-            cells.forEach((c) => (c.style.pointerEvents = "auto"));
+            cells.forEach((c) => {
+              console.log(c.classList);
+              if (
+                !c.classList.contains("hit") &&
+                !c.classList.contains("miss") &&
+                !c.classList.contains("sunk")
+              )
+                c.style.pointerEvents = "auto";
+            });
             cell.style.pointerEvents = "none";
           });
         displayCellHits(cell, hit, x, y, enemyBoard);
