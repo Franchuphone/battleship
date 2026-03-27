@@ -123,7 +123,6 @@ export class ComputerPlayer extends Player {
 
   attack(enemyBoard) {
     let coord;
-    console.log(this.targets);
     if (this.mode === "target" && this.targets.length > 0) {
       coord = this.targets.pop();
     }

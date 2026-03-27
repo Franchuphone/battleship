@@ -81,6 +81,7 @@ export function displayBattle() {
   displayInfoBar("Your turn to attack");
   playerBoard = playerGrid;
   enemyBoard = enemyGrid;
+  console.log(game.computer.gameboard.board);
   playerGrid.classList.add("battle");
   leftPanel.append(playerName, playerGrid);
   rightPanel.append(enemyName, enemyGrid);
@@ -103,7 +104,7 @@ export function displayEndGame(winner) {
   newGameBtn.addEventListener("click", () => {
     game = new Game();
     displaySetup();
-    dialog.close();
+    dialog.remove();
     restartBtn.remove();
   });
 }
@@ -205,6 +206,7 @@ function displayGrid(name, type) {
               targetCell = playerBoard.querySelector(`[x="${cx}"][y="${cy}"]`);
             displayCellHits(targetCell, computerHit, cx, cy, playerBoard);
             cells.forEach((c) => (c.style.pointerEvents = "auto"));
+            cell.style.pointerEvents = "none";
           });
         displayCellHits(cell, hit, x, y, enemyBoard);
       });
