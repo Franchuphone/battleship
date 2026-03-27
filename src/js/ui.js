@@ -19,6 +19,7 @@ export function displayInfoBar(string = "Waiting for your fleet") {
   infoBar.textContent = string;
 }
 
+// Interactions on initial game launch
 export function displaySetup() {
   const { leftPanel, rightPanel } = listenElements(),
     { grid, gridName } = displayGrid(game.playerName, "setup");
@@ -57,6 +58,7 @@ export function displaySetup() {
   });
 }
 
+// Switch display on start game button push
 export function displayBattle() {
   const { leftPanel, rightPanel } = listenElements(),
     restartBtn = document.createElement("button");
@@ -81,7 +83,6 @@ export function displayBattle() {
   displayInfoBar("Your turn to attack");
   playerBoard = playerGrid;
   enemyBoard = enemyGrid;
-  console.log(game.computer.gameboard.board);
   playerGrid.classList.add("battle");
   leftPanel.append(playerName, playerGrid);
   rightPanel.append(enemyName, enemyGrid);
@@ -138,6 +139,7 @@ export function listenElements() {
   };
 }
 
+// Handle the different grids display and event listeners on them
 function displayGrid(name, type) {
   const gridName = document.createElement("div"),
     grid = generateGrid(name),
@@ -206,7 +208,6 @@ function displayGrid(name, type) {
               targetCell = playerBoard.querySelector(`[x="${cx}"][y="${cy}"]`);
             displayCellHits(targetCell, computerHit, cx, cy, playerBoard);
             cells.forEach((c) => {
-              console.log(c.classList);
               if (
                 !c.classList.contains("hit") &&
                 !c.classList.contains("miss") &&
