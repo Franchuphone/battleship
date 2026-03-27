@@ -197,14 +197,13 @@ function displayGrid(name, type) {
   if (type === "battle-enemy") {
     cells.forEach((cell) => {
       cell.addEventListener("click", () => {
-        cells.forEach((c) => (c.style.pointerEvents = "none"));
+        cell.style.pointerEvents = "none";
         const x = parseInt(cell.getAttribute("x")),
           y = parseInt(cell.getAttribute("y")),
           hit = handlePlayerAttack([x, y], (computerHit, coord) => {
             const [cx, cy] = coord,
               targetCell = playerBoard.querySelector(`[x="${cx}"][y="${cy}"]`);
             displayCellHits(targetCell, computerHit, cx, cy, playerBoard);
-            cells.forEach((c) => (c.style.pointerEvents = "auto"));
           });
         displayCellHits(cell, hit, x, y, enemyBoard);
       });
