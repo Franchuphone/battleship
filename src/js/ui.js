@@ -48,6 +48,7 @@ export function displaySetup() {
     game.player.gameboard.reset();
     game.player.randomPlaceShips();
     const { grid, gridName } = displayGrid(game.playerName, "setup");
+    grid.style.pointerEvents = "none";
     rightPanel.innerHTML = "";
     rightPanel.append(gridName, grid);
     displayRandomGeneratedShips(grid);
