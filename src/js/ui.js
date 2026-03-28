@@ -180,7 +180,7 @@ function displayGrid(name, type) {
           direction = dragData.direction,
           valid = game.placePlayerShip([x, y], length, direction);
         highlightCells(grid, x, y, length, direction, valid, "drop");
-        if (valid) {
+        if (valid && dragData.length > 0) {
           dragData.element.classList.add("placed");
           dragData.element.classList.remove("vertical");
           dragData.element.setAttribute("draggable", false);
@@ -188,6 +188,7 @@ function displayGrid(name, type) {
             "contextmenu",
             dragData.handleRotation,
           );
+          dragData = {};
           if (game.player.gameboard.ships.length === 5) {
             const { startBtn } = listenElements();
             startBtn.classList.remove("inactive");
