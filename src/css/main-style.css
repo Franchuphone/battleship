@@ -366,6 +366,7 @@ dialog::backdrop {
   overflow: hidden;
   text-align: center;
   padding: calc(1.5 * var(--size-pri));
+  z-index: -1;
 }
 
 .sonar-emitter,
