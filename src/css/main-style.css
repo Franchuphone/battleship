@@ -261,7 +261,7 @@ button:not(.inactive):hover {
   perspective: 400px;
 
   .cell {
-    width: clamp(1rem, 1rem + 2vw, 5rem);
+    width: clamp(1rem, 1rem + max(1.5vh, 1.5vw), 5rem);
     aspect-ratio: 1 /1;
     position: relative;
     border-radius: 0.3em;
