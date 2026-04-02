@@ -67,7 +67,7 @@ export function displayBattle() {
   restartBtn.id = "restart";
   restartBtn.textContent = "NEW";
   restartBtn.addEventListener("click", () => {
-    game = new Game();
+    game = new Game("Your fleet");
     displaySetup();
     restartBtn.remove();
   });
@@ -104,7 +104,7 @@ export function displayEndGame(winner) {
   dialog.showModal();
   const { newGameBtn, restartBtn } = listenElements();
   newGameBtn.addEventListener("click", () => {
-    game = new Game();
+    game = new Game("Your fleet");
     displaySetup();
     dialog.remove();
     restartBtn.remove();
